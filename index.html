@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b2844">
+<title>MediLocker 360° Product Prototype</title>
+<style>
+:root{
+ --navy:#0b2844;--navy2:#123d67;--blue:#1677ff;--cyan:#43c7ee;--sky:#eaf6ff;
+ --bg:#edf4f8;--card:#fff;--line:#d6e3ec;--text:#15324a;--muted:#6b8193;
+ --green:#18a878;--red:#da5963;--orange:#d9912e;--steel:#edf2f5;--shadow:rgba(12,45,73,.16);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,"Noto Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+button{font:inherit}
+header{
+ height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);
+ display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:100
+}
+.brand{font-size:20px;font-weight:950;color:var(--navy);letter-spacing:-.3px}
+.brand span{color:var(--blue)}
+.status-pill{display:flex;align-items:center;gap:7px;background:#eaf9f4;color:#12835e;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:850}
+.status-dot{width:8px;height:8px;background:var(--green);border-radius:50%;box-shadow:0 0 0 5px rgba(24,168,120,.11)}
+main{max-width:1280px;margin:auto;padding:22px}
+.hero{
+ background:
+ radial-gradient(circle at 84% 20%,rgba(67,199,238,.28),transparent 28%),
+ linear-gradient(135deg,#09243d 0%,#103e67 54%,#176fcf 100%);
+ color:#fff;border-radius:26px;padding:28px;position:relative;overflow:hidden
+}
+.hero:after{content:"";position:absolute;width:260px;height:260px;border:1px solid rgba(255,255,255,.12);border-radius:50%;right:-90px;bottom:-140px}
+.hero small{font-weight:800;color:#aee2ff;letter-spacing:.08em;text-transform:uppercase}
+.hero h1{font-size:38px;line-height:1.12;margin:7px 0 10px;letter-spacing:-.8px}
+.hero p{max-width:760px;margin:0;color:#dceeff;line-height:1.65}
+.quick-specs{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.quick-specs span{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);padding:8px 11px;border-radius:999px;font-size:13px;font-weight:750}
+
+.layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:16px;margin-top:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 14px 32px rgba(16,55,86,.06)}
+.viewer-card{padding:16px}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.card-head h2{margin:0;color:var(--navy);font-size:22px}
+.card-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.viewer-tools{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.tool{
+ border:1px solid var(--line);background:#fff;color:var(--navy);padding:8px 10px;border-radius:10px;font-weight:850;font-size:12px;cursor:pointer
+}
+.tool.active,.tool:hover{background:#eaf4ff;border-color:#9ecaff;color:var(--blue)}
+
+.viewer{
+ height:690px;border:1px solid var(--line);border-radius:18px;position:relative;overflow:hidden;
+ background:
+ linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,.4)),
+ radial-gradient(circle at 50% 35%,#fff 0,#eef6fb 48%,#dbe9f2 100%);
+ perspective:1200px;touch-action:none;cursor:grab;user-select:none
+}
+.viewer.dragging{cursor:grabbing}
+.viewer:after{content:"";position:absolute;left:18%;right:18%;bottom:42px;height:52px;background:rgba(17,52,79,.13);filter:blur(15px);border-radius:50%}
+.axis-label{position:absolute;left:14px;top:14px;z-index:5;background:rgba(255,255,255,.9);border:1px solid var(--line);padding:8px 10px;border-radius:12px;font-size:11px;font-weight:850;color:var(--muted)}
+.drag-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:15px;z-index:6;background:rgba(8,36,61,.82);color:#fff;padding:8px 12px;border-radius:999px;font-size:11px;font-weight:750}
+
+.scene{position:absolute;left:50%;top:51%;width:360px;height:600px;transform-style:preserve-3d;transform:translate(-50%,-50%) rotateX(-7deg) rotateY(-18deg);transition:transform .7s cubic-bezier(.2,.8,.2,1);z-index:3}
+.scene.no-transition{transition:none}
+.cabinet{width:360px;height:600px;position:absolute;transform-style:preserve-3d}
+.face{position:absolute;backface-visibility:visible;border:1px solid #bacbd7;box-shadow:inset 0 0 0 1px rgba(255,255,255,.65)}
+.front,.back{width:360px;height:600px;left:0;top:0}
+.left,.right{width:250px;height:600px;left:55px;top:0}
+.top,.bottom{width:360px;height:250px;left:0;top:175px}
+.front{transform:translateZ(125px);background:linear-gradient(90deg,#eef3f6 0,#fff 46%,#e8eef2 100%);border-radius:18px 18px 9px 9px}
+.back{transform:rotateY(180deg) translateZ(125px);background:linear-gradient(90deg,#e4ebef,#f8fafb,#dce5ea);border-radius:12px}
+.right{transform:rotateY(90deg) translateZ(180px);background:linear-gradient(90deg,#dfe7ec,#f2f6f8);border-radius:8px}
+.left{transform:rotateY(-90deg) translateZ(180px);background:linear-gradient(90deg,#f3f6f8,#dce5ea);border-radius:8px}
+.top{height:250px;transform:rotateX(90deg) translateZ(300px);background:#f7f9fa}
+.bottom{height:250px;transform:rotateX(-90deg) translateZ(300px);background:#b8c6cf}
+
+.led{position:absolute;left:25px;right:25px;top:13px;height:8px;border-radius:99px;background:var(--green);box-shadow:0 0 18px rgba(24,168,120,.72)}
+.screen-frame{position:absolute;left:96px;top:45px;width:168px;height:122px;border-radius:12px;background:#d5e0e7;padding:5px;box-shadow:0 3px 10px rgba(18,55,84,.18)}
+.screen{height:100%;border-radius:8px;background:linear-gradient(150deg,#092845,#164f7e);color:white;padding:11px}
+.screen small{font-size:10px;color:#b9e7ff}.screen strong{display:block;font-size:17px;margin:8px 0 5px}.screen .micro{font-size:9px;opacity:.82}
+.qr{position:absolute;left:128px;top:178px;width:74px;height:31px;border-radius:7px;background:#263a4d;border:3px solid #d4dfe6}
+.qr:after{content:"";position:absolute;left:8px;right:8px;top:11px;height:3px;background:#e84d5a;box-shadow:0 0 7px rgba(232,77,90,.85)}
+.rfid{position:absolute;left:216px;top:181px;width:32px;height:26px;border-radius:7px;border:2px solid #a7bac7;background:#f8fbfd}
+.rfid:before,.rfid:after{content:"";position:absolute;border:1.5px solid #6b8294;border-left:0;border-top:0;border-bottom:0;border-radius:50%}
+.rfid:before{width:10px;height:14px;left:5px;top:4px}.rfid:after{width:16px;height:20px;left:4px;top:1px}
+
+.compartments{position:absolute;left:29px;right:29px;top:230px;bottom:52px;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(5,1fr);gap:7px}
+.slot{position:relative;border:2px solid #c8d6df;border-radius:8px;background:linear-gradient(140deg,#fff,#eef3f6);box-shadow:inset 0 0 12px rgba(27,63,91,.04)}
+.slot.cold{background:linear-gradient(140deg,#f2fbff,#dff3ff)}
+.slot .n{position:absolute;left:9px;top:7px;font-weight:950;color:#34556d;font-size:12px}
+.slot .lock-dot{position:absolute;right:8px;top:50%;width:8px;height:8px;border-radius:50%;background:var(--green);transform:translateY(-50%)}
+.slot.cold .n{color:var(--blue)}
+.front-base{position:absolute;left:24px;right:24px;bottom:18px;height:20px;background:#c0cdd5;border-radius:8px}
+.wheel{position:absolute;bottom:-12px;width:22px;height:22px;background:#41596a;border:4px solid #aebfc9;border-radius:50%}.wa{left:45px}.wb{right:45px}
+
+.side-vent{position:absolute;left:35px;right:35px;top:170px;height:125px;border-radius:11px;background:repeating-linear-gradient(0deg,#a7b8c3 0 4px,#dfe7ec 4px 11px);border:1px solid #9eb1bd}
+.side-door{position:absolute;left:35px;right:35px;top:320px;height:170px;border:2px solid #b8c8d2;border-radius:12px;background:linear-gradient(140deg,#f6f9fa,#e0e8ed)}
+.side-door:after{content:"SERVICE";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:900;color:#8397a6;letter-spacing:.1em}
+.power-port{position:absolute;left:76px;bottom:58px;width:42px;height:32px;border-radius:7px;background:#334a5d}
+.network{position:absolute;right:74px;bottom:61px;width:29px;height:25px;border-radius:5px;background:#6e8595}
+
+.back .fan{position:absolute;width:106px;height:106px;border:7px solid #9fb1bc;border-radius:50%;left:127px;top:95px;background:repeating-conic-gradient(#8398a6 0 14deg,#d5dfe5 14deg 28deg)}
+.back .fan:after{content:"";position:absolute;width:24px;height:24px;background:#596f7e;border-radius:50%;left:34px;top:34px;border:7px solid #dfe6ea}
+.back .grill{position:absolute;left:58px;right:58px;top:246px;height:90px;background:repeating-linear-gradient(0deg,#a8b7c0 0 3px,#e6ecef 3px 9px);border-radius:10px}
+.back .service{position:absolute;left:42px;right:42px;bottom:78px;height:120px;border:2px solid #aebec8;border-radius:12px}
+.back .service:after{content:"INVERTER • R290 • POWER";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:11px;font-weight:950;color:#687f8f;letter-spacing:.08em}
+
+.hotspot{
+ position:absolute;width:30px;height:30px;border-radius:50%;border:3px solid #fff;background:var(--blue);color:#fff;
+ display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:950;box-shadow:0 5px 15px rgba(22,119,255,.38);
+ cursor:pointer;z-index:20;animation:pulse 2.2s infinite
+}
+.hotspot:hover{transform:scale(1.12);background:#0a5ed0}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,119,255,.28),0 5px 15px rgba(22,119,255,.35)}50%{box-shadow:0 0 0 9px rgba(22,119,255,0),0 5px 15px rgba(22,119,255,.35)}}
+.front .hs-led{right:5px;top:6px}.front .hs-screen{right:63px;top:92px}.front .hs-scan{right:70px;top:178px}.front .hs-door{right:9px;top:307px}.front .hs-base{right:10px;bottom:20px}
+.right .hs-body{right:18px;top:55px}.right .hs-insulation{right:18px;top:135px}.right .hs-cooling{right:19px;top:222px}.right .hs-power{right:18px;bottom:83px}
+.left .hs-rfid{left:15px;top:178px}.left .hs-inner{left:15px;top:305px}.left .hs-air{left:15px;top:412px}
+.back .hs-fan{right:28px;top:120px}.back .hs-sensor{right:26px;top:265px}.back .hs-pc{right:25px;bottom:135px}.back .hs-battery{left:27px;bottom:95px}
+
+.viewer-bottom{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:11px}
+.angle-buttons{display:flex;gap:7px;flex-wrap:wrap}
+.angle-buttons button{border:1px solid var(--line);background:#fff;padding:8px 10px;border-radius:10px;color:var(--navy);font-weight:850;font-size:12px;cursor:pointer}
+.angle-buttons button:hover{background:#eaf4ff;color:var(--blue)}
+.dimensions{font-size:12px;color:var(--muted);font-weight:800}
+
+.info-card{padding:18px;position:sticky;top:80px;align-self:start}
+.info-card h2{margin:0;color:var(--navy)}
+.part-label{display:inline-flex;margin-top:9px;background:#eaf3ff;color:var(--blue);border-radius:999px;padding:6px 9px;font-size:11px;font-weight:900}
+.part-title{font-size:25px;line-height:1.2;margin:12px 0 6px;color:var(--navy)}
+.part-desc{margin:0;color:#425c70;line-height:1.65}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}
+.detail-box{border:1px solid var(--line);background:#f8fbfd;border-radius:13px;padding:11px}
+.detail-box small{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.detail-box b{color:var(--navy);font-size:13px}
+.note{margin-top:12px;border-left:4px solid var(--blue);background:#eef7ff;padding:11px 12px;border-radius:10px;font-size:12px;line-height:1.5;color:#36536a}
+.material-list{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:7px}
+.material-list li{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 10px;font-size:12px;color:#36536a}
+
+.section-card{margin-top:16px;padding:20px}
+.section-card h2{margin:0;color:var(--navy)}
+.section-card>p{color:var(--muted);font-size:13px}
+.spec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.spec{border:1px solid var(--line);border-radius:14px;padding:13px;background:#f9fcfd}
+.spec small{display:block;color:var(--muted);font-size:10px}.spec b{display:block;margin-top:4px;color:var(--navy);font-size:16px}
+.system-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:14px}
+.sys{border:1px solid var(--line);border-radius:15px;padding:14px;background:#fbfdff}
+.sys .icon{width:36px;height:36px;border-radius:11px;background:#eaf3ff;color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:950;margin-bottom:9px}
+.sys h3{margin:0 0 5px;font-size:15px;color:var(--navy)}.sys p{margin:0;font-size:12px;line-height:1.55;color:#587083}
+
+.modebar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.modebar button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font-weight:850;color:var(--navy);cursor:pointer}
+.modebar button.active{background:var(--navy);color:#fff}
+body.xray .front,body.xray .left,body.xray .right,body.xray .back{opacity:.45}
+body.xray .hotspot{opacity:1}
+.internal-overlay{position:absolute;left:50%;top:50%;width:250px;height:430px;transform:translate(-50%,-50%) translateZ(5px);display:none;z-index:15;pointer-events:none}
+body.xray .internal-overlay{display:block}
+.internal-shell{width:100%;height:100%;border:2px dashed #5b829d;border-radius:18px;background:rgba(237,249,255,.28);position:relative}
+.internal-shell .coil{position:absolute;left:35px;right:35px;bottom:52px;height:70px;border-radius:12px;background:repeating-linear-gradient(90deg,rgba(22,119,255,.75) 0 6px,rgba(67,199,238,.35) 6px 13px)}
+.internal-shell .pc{position:absolute;right:18px;top:55px;width:75px;height:58px;border-radius:8px;background:rgba(18,61,103,.8)}
+.internal-shell .battery{position:absolute;left:18px;bottom:145px;width:78px;height:48px;border-radius:7px;background:rgba(24,168,120,.78)}
+.internal-shell .fan2{position:absolute;left:20px;top:55px;width:58px;height:58px;border-radius:50%;border:8px solid rgba(22,119,255,.65)}
+
+@media(max-width:980px){
+ main{padding:13px}.hero{padding:21px}.hero h1{font-size:29px}.layout{grid-template-columns:1fr}
+ .viewer{height:620px}.info-card{position:static}.spec-grid{grid-template-columns:repeat(2,1fr)}.system-grid{grid-template-columns:1fr 1fr}
+ .scene{transform:translate(-50%,-50%) scale(.88) rotateX(-7deg) rotateY(-18deg)}
+}
+@media(max-width:620px){
+ header{height:56px;padding:0 12px}.brand{font-size:16px}.status-pill{display:none}.hero h1{font-size:25px}
+ .viewer-card{padding:10px}.viewer{height:555px}.scene{transform:translate(-50%,-50%) scale(.76) rotateX(-7deg) rotateY(-18deg)}
+ .viewer-bottom{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}.spec-grid,.system-grid{grid-template-columns:1fr}
+ .card-head{display:block}.viewer-tools{justify-content:flex-start;margin-top:9px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">✚ Medi<span>Locker</span> 360° Prototype</div>
+  <div class="status-pill"><span class="status-dot"></span> Interactive Product Explorer</div>
+</header>
+
+<main>
+<section class="hero">
+  <small>Healthcare Last-Mile Smart Locker</small>
+  <h1>MediLocker Product Prototype — 360° Interactive</h1>
+  <p>สำรวจโครงสร้างตู้ วัสดุ ระบบควบคุมอุณหภูมิ ระบบล็อก และอุปกรณ์อิเล็กทรอนิกส์ภายในได้จากโมเดลเดียว ลากหรือปัดเพื่อหมุนตู้รอบ 360° แล้วแตะจุดสีน้ำเงินเพื่อดูรายละเอียดแต่ละส่วน</p>
+  <div class="quick-specs">
+    <span>ภายนอก 90 × 90 × 195 cm</span>
+    <span>10 ช่องยา</span>
+    <span>ช่องละ 25 × 26 × 50 cm</span>
+    <span>15.6" Touchscreen</span>
+    <span>2–8°C / 15–25°C</span>
+    <span>35–60% RH</span>
+  </div>
+</section>
+
+<section class="card section-card" style="margin-top:16px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+    <div>
+      <h2>เลือกโหมดการดูต้นแบบ</h2>
+      <p style="margin:4px 0 0">สลับมุมมองได้ทันที ก่อนสำรวจโมเดล 360°</p>
+    </div>
+    <div class="modebar" style="margin-top:0">
+      <button class="active" onclick="setMode('normal',this)">Normal Exterior</button>
+      <button onclick="setMode('xray',this)">X-Ray Internal Systems</button>
+      <button onclick="snap(0)">Front Specification View</button>
+      <button onclick="snap(-180)">Rear Engineering View</button>
+    </div>
+  </div>
+</section>
+
+<div class="layout">
+  <section class="card viewer-card">
+    <div class="card-head">
+      <div>
+        <h2>360° Cabinet Explorer</h2>
+        <p>ลากเมาส์หรือปัดนิ้วซ้าย–ขวาเพื่อหมุน • แตะ Hotspot เพื่อดูวัสดุและหน้าที่</p>
+      </div>
+      <div class="viewer-tools">
+        <button class="tool active" id="rotateBtn" onclick="toggleAuto()">Auto Rotate</button>
+        <button class="tool" onclick="toggleXray(this)">X-Ray View</button>
+        <button class="tool" onclick="resetView()">Reset</button>
+      </div>
+    </div>
+
+    <div class="viewer" id="viewer">
+      <div class="axis-label" id="viewLabel">Front / Right Perspective</div>
+      <div class="scene" id="scene">
+        <div class="cabinet">
+          <div class="face front">
+            <div class="led"></div>
+            <div class="screen-frame"><div class="screen"><small>MEDILOCKER</small><strong>READY</strong><div class="micro">Scan QR / Enter OTP</div></div></div>
+            <div class="qr"></div><div class="rfid"></div>
+            <div class="compartments">
+              <div class="slot"><span class="n">01</span><span class="lock-dot"></span></div>
+              <div class="slot"><span class="n">02</span><span class="lock-dot"></span></div>
+              <div class="slot"><span class="n">03</span><span class="lock-dot"></span></div>
+              <div class="slot"><span class="n">04</span><span class="lock-dot"></span></div>
+              <div class="slot"><span class="n">05</span><span class="lock-dot"></span></div>
+              <div class="slot"><span class="n">06</span><span class="lock-dot"></span></div>
+              <div class="slot cold"><span class="n">07</span><span class="lock-dot"></span></div>
+              <div class="slot cold"><span class="n">08</span><span class="lock-dot"></span></div>
+              <div class="slot cold"><span class="n">09</span><span class="lock-dot"></span></div>
+              <div class="slot cold"><span class="n">10</span><span class="lock-dot"></span></div>
+            </div>
+            <div class="front-base"></div><div class="wheel wa"></div><div class="wheel wb"></div>
+
+            <button class="hotspot hs-led" data-part="led">1</button>
+            <button class="hotspot hs-screen" data-part="screen">2</button>
+            <button class="hotspot hs-scan" data-part="scanner">3</button>
+            <button class="hotspot hs-door" data-part="door">4</button>
+            <button class="hotspot hs-base" data-part="base">5</button>
+          </div>
+
+          <div class="face right">
+            <div class="side-vent"></div><div class="side-door"></div><div class="power-port"></div><div class="network"></div>
+            <button class="hotspot hs-body" data-part="body">6</button>
+            <button class="hotspot hs-insulation" data-part="insulation">7</button>
+            <button class="hotspot hs-cooling" data-part="cooling">8</button>
+            <button class="hotspot hs-power" data-part="power">9</button>
+          </div>
+
+          <div class="face left">
+            <div class="side-vent"></div><div class="side-door"></div>
+            <button class="hotspot hs-rfid" data-part="rfid">10</button>
+            <button class="hotspot hs-inner" data-part="interior">11</button>
+            <button class="hotspot hs-air" data-part="airflow">12</button>
+          </div>
+
+          <div class="face back">
+            <div class="fan"></div><div class="grill"></div><div class="service"></div>
+            <button class="hotspot hs-fan" data-part="fan">13</button>
+            <button class="hotspot hs-sensor" data-part="sensor">14</button>
+            <button class="hotspot hs-pc" data-part="pc">15</button>
+            <button class="hotspot hs-battery" data-part="battery">16</button>
+          </div>
+
+          <div class="face top"></div>
+          <div class="face bottom"></div>
+
+          <div class="internal-overlay">
+            <div class="internal-shell"><div class="fan2"></div><div class="pc"></div><div class="battery"></div><div class="coil"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="drag-hint">↔ ลาก / ปัดเพื่อหมุน 360°</div>
+    </div>
+
+    <div class="viewer-bottom">
+      <div class="angle-buttons">
+        <button onclick="snap(0)">Front</button>
+        <button onclick="snap(-90)">Right</button>
+        <button onclick="snap(-180)">Back</button>
+        <button onclick="snap(-270)">Left</button>
+      </div>
+      <div class="dimensions">W 90 × D 90 × H 195 cm</div>
+    </div>
+  </section>
+
+  <aside class="card info-card">
+    <h2>Component Detail</h2>
+    <span class="part-label" id="partCode">HOTSPOT 1</span>
+    <div class="part-title" id="partTitle">แถบไฟสถานะ LED</div>
+    <p class="part-desc" id="partDesc">แถบ LED บริเวณขอบบนของตู้ ใช้แสดงสถานะการทำงานเพื่อให้ผู้ใช้งานและเจ้าหน้าที่มองเห็นได้ทันที</p>
+    <div class="detail-grid">
+      <div class="detail-box"><small>วัสดุ / อุปกรณ์</small><b id="partMaterial">LED Status Strip</b></div>
+      <div class="detail-box"><small>ตำแหน่ง</small><b id="partLocation">ขอบบนด้านหน้า</b></div>
+      <div class="detail-box"><small>หน้าที่หลัก</small><b id="partFunction">แสดงสถานะระบบ</b></div>
+      <div class="detail-box"><small>Specification</small><b id="partSpec">เขียว / ฟ้า / แดง</b></div>
+    </div>
+    <div class="note" id="partNote">สีเขียว = พร้อมใช้งาน • สีฟ้า = กำลังทำความเย็น • สีแดง = ระบบขัดข้องหรือมี Alert</div>
+    <ul class="material-list" id="partList"></ul>
+  </aside>
+</div>
+
+<section class="card section-card">
+  <h2>ขนาดและโครงสร้างหลัก</h2>
+  <p>ค่าด้านล่างเป็นสเปก Prototype ล่าสุดตามแบบของ MediLocker</p>
+  <div class="spec-grid">
+    <div class="spec"><small>ขนาดตู้ภายนอก</small><b>90 × 90 × 195 cm</b></div>
+    <div class="spec"><small>ช่องเก็บยา</small><b>10 ช่อง</b></div>
+    <div class="spec"><small>ขนาดช่องย่อย</small><b>25 × 26 × 50 cm</b></div>
+    <div class="spec"><small>หน้าจอสัมผัส</small><b>15.6 นิ้ว</b></div>
+    <div class="spec"><small>ขนาดหน้าจอโดยประมาณ</small><b>19.5 × 34.5 cm</b></div>
+    <div class="spec"><small>ฉนวน PU Foam</small><b>50 mm</b></div>
+    <div class="spec"><small>แผ่นเหล็ก SPCC</small><b>1.2 mm</b></div>
+    <div class="spec"><small>Powder Coating</small><b>≈ 80 μm</b></div>
+  </div>
+</section>
+
+<section class="card section-card">
+  <h2>ระบบภายใน MediLocker</h2>
+  <p>สรุปองค์ประกอบทางวิศวกรรมทั้งหมดที่ใช้ใน Prototype</p>
+  <div class="system-grid">
+    <div class="sys"><div class="icon">01</div><h3>Exterior Body</h3><p>SPCC Steel 1.2 mm เคลือบ UV-Resistant Polyester Powder Coating เกรดทางการแพทย์ ความหนาฟิล์มประมาณ 80 μm</p></div>
+    <div class="sys"><div class="icon">02</div><h3>Double-Layer Door</h3><p>บานประตูเหล็กสองชั้น เสริม C-Channel / Hat-Channel SPCC/GI รองรับชุดกลอนไฟฟ้าและช่วยให้บานแนบสนิท</p></div>
+    <div class="sys"><div class="icon">03</div><h3>PU Insulation</h3><p>High-Density Polyurethane Foam ฉีดแน่นไร้รอยต่อ หนา 50 mm เพื่อลดการถ่ายเทความร้อน</p></div>
+    <div class="sys"><div class="icon">04</div><h3>EPDM / Silicone Gasket</h3><p>ขอบยางเกรดการแพทย์พร้อม Magnetic Strip ป้องกันอากาศและความชื้นรั่วผ่านบานประตู</p></div>
+    <div class="sys"><div class="icon">05</div><h3>SUS304 Interior</h3><p>ผนังภายในและถาดวางยาใช้ Stainless Steel SUS304 ทำความสะอาดง่ายและทนความชื้น</p></div>
+    <div class="sys"><div class="icon">06</div><h3>Perforated Tray</h3><p>ถาด Stainless 304 แบบเจาะรู ช่วยให้อากาศและลมเย็นหมุนเวียนผ่านทุกช่อง</p></div>
+    <div class="sys"><div class="icon">07</div><h3>Electric Lock + Feedback</h3><p>Solenoid Lock / Electromagnetic Latch พร้อม Feedback Signal และ Magnetic Door Switch ตรวจสถานะล็อกและปิดบาน</p></div>
+    <div class="sys"><div class="icon">08</div><h3>Cooling System</h3><p>Inverter Compressor ใช้สารทำความเย็น R290 ออกแบบรองรับโซน 2–8°C และ 15–25°C</p></div>
+    <div class="sys"><div class="icon">09</div><h3>Humidity Control</h3><p>Dehumidifier รักษาความชื้นสัมพัทธ์ประมาณ 35–60% RH เพื่อลดความเสี่ยงต่อยาและบรรจุภัณฑ์</p></div>
+    <div class="sys"><div class="icon">10</div><h3>Air Circulation</h3><p>Brushless DC Fan หมุนเวียนอากาศเพื่อให้อุณหภูมิและความชื้นสม่ำเสมอ</p></div>
+    <div class="sys"><div class="icon">11</div><h3>Temperature & Humidity Sensor</h3><p>PT100 สำหรับวัดอุณหภูมิความแม่นยำสูง ร่วมกับ Humidity Sensor ส่งข้อมูลเข้าระบบควบคุม</p></div>
+    <div class="sys"><div class="icon">12</div><h3>Industrial Mini PC</h3><p>ประมวลผลหลัก พร้อม Wi-Fi / LAN / 4G สำหรับเชื่อม HIS / Database และ Cloud Dashboard</p></div>
+    <div class="sys"><div class="icon">13</div><h3>Touchscreen</h3><p>Industrial Capacitive Touchscreen 15.6 นิ้ว ความสว่างสูง ครอบ Safety Glass หนา 2 mm</p></div>
+    <div class="sys"><div class="icon">14</div><h3>QR / Barcode Scanner</h3><p>Embedded CMOS Imager Scanner อ่าน QR และ Barcode จากหน้าจอมือถือหรือกระดาษ</p></div>
+    <div class="sys"><div class="icon">15</div><h3>RFID Reader</h3><p>รองรับบัตรเจ้าหน้าที่ บัตรประชาชน หรือ Smart Card สำหรับการยืนยันตัวตนตามสิทธิ์</p></div>
+    <div class="sys"><div class="icon">16</div><h3>Backup Power</h3><p>Lithium-ion Battery สำรองให้ระบบควบคุม หน้าจอ และกลอนประตูทำงานต่อประมาณ 2–4 ชั่วโมง</p></div>
+  </div>
+</section>
+
+
+</main>
+
+<script>
+const parts={
+ led:{
+  code:"HOTSPOT 1",title:"แถบไฟสถานะ LED",
+  desc:"แถบไฟ LED บริเวณขอบบนสุดของตู้ ใช้สื่อสารสถานะระบบแบบมองเห็นได้ทันทีทั้งผู้ป่วยและเจ้าหน้าที่",
+  material:"LED Status Strip",location:"ขอบบนด้านหน้า",func:"แสดงสถานะระบบ",spec:"Green / Blue / Red",
+  note:"สีเขียว = พร้อมใช้งาน • สีฟ้า = กำลังทำความเย็น • สีแดง = ขัดข้อง / Alert",
+  list:["ติดตั้งให้มองเห็นได้จากระยะไกล","เชื่อมกับ Controller เพื่อเปลี่ยนสีตามสถานะระบบ"]
+ },
+ screen:{
+  code:"HOTSPOT 2",title:"Industrial Capacitive Touchscreen",
+  desc:"จอสัมผัสหลักสำหรับรับยา ยืนยันตัวตน แสดงคำแนะนำ และข้อมูลสถานะการทำงานของตู้",
+  material:"Industrial Capacitive Touchscreen",location:"แผงควบคุมด้านหน้า",func:"User Interface",spec:'15.6" • 19.5 × 34.5 cm',
+  note:"ครอบทับด้วย Safety Glass หนา 2 mm เพื่อช่วยป้องกันรอยขีดข่วนและละอองน้ำ",
+  list:["High-Brightness Industrial Display","Safety Glass 2 mm","รองรับการใช้งานด้วยการสัมผัส"]
+ },
+ scanner:{
+  code:"HOTSPOT 3",title:"QR / Barcode Scanner",
+  desc:"โมดูลสแกนเนอร์แบบฝังสำหรับอ่าน QR Code และ Barcode จากมือถือหรือเอกสาร ใช้ตรวจสอบ Order และสิทธิ์การรับยา",
+  material:"CMOS Imager Scanner",location:"ใต้หน้าจอ",func:"อ่าน QR / Barcode",spec:"Mobile Screen + Paper",
+  note:"ใช้ร่วมกับ OTP และ Order Mapping เพื่อเปิดเฉพาะช่องที่ผูกกับคำสั่งยานั้น",
+  list:["Embedded CMOS Imaging Module","รองรับ 1D Barcode และ 2D QR Code"]
+ },
+ door:{
+  code:"HOTSPOT 4",title:"ประตูช่องเก็บยา + ระบบล็อกสองชั้น",
+  desc:"ประตูเหล็กทึบมีหมายเลขช่องชัดเจน ใช้ Electric Lock พร้อม Feedback และ Magnetic Switch เพื่อตรวจสอบทั้งสถานะการล็อกและการปิดบาน",
+  material:"Steel Door + Solenoid / EM Latch",location:"ช่องยา 01–10",func:"รักษาความปลอดภัย + ตรวจสถานะ",spec:"10 Compartments",
+  note:"ระบบต้องยืนยันทั้ง Lock Feedback และ Door Closed Signal ก่อนบันทึกว่าช่องปิดสมบูรณ์",
+  list:["Solenoid Lock / Electromagnetic Latch","Feedback Signal Wire","Magnetic Door Switch","หมายเลขช่องสกรีนชัดเจน"]
+ },
+ base:{
+  code:"HOTSPOT 5",title:"ฐานและชุดเคลื่อนย้าย",
+  desc:"ฐานตู้รองรับการติดตั้งในพื้นที่จริง สามารถปรับระดับและเคลื่อนย้ายเพื่อบำรุงรักษาได้",
+  material:"Heavy-Duty Feet + Locking Casters",location:"ฐานล่าง",func:"ปรับระดับ / รับน้ำหนัก / เคลื่อนย้าย",spec:"Lockable Heavy-Duty",
+  note:"เมื่อติดตั้งใช้งานให้ล็อกล้อและปรับ Leveling Feet เพื่อให้ตู้มั่นคง",
+  list:["Heavy-Duty Leveling Feet","Heavy-Load Lockable Casters"]
+ },
+ body:{
+  code:"HOTSPOT 6",title:"โครงสร้างภายนอก",
+  desc:"ตัวถังหลักใช้แผ่นเหล็ก SPCC ความหนา 1.2 mm เคลือบสีฝุ่นเกรดทางการแพทย์เพื่อเพิ่มความทนทานต่อสนิมและสารทำความสะอาด",
+  material:"SPCC Steel",location:"ผนังภายนอกทั้งหมด",func:"โครงสร้างหลัก",spec:"1.2 mm",
+  note:"เคลือบ UV-Resistant Polyester Powder Coating และอบด้วยความร้อนสูง ความหนาฟิล์มประมาณ 80 μm",
+  list:["SPCC Steel 1.2 mm","UV-Resistant Polyester Powder Coating","Film Thickness ≈ 80 μm"]
+ },
+ insulation:{
+  code:"HOTSPOT 7",title:"ฉนวนโพลียูรีเทนโฟม",
+  desc:"ฉนวนความหนาแน่นสูงถูกฉีดขึ้นรูปแน่นระหว่างผนังชั้นนอกและชั้นใน เพื่อลดการถ่ายเทความร้อนและช่วยรักษาอุณหภูมิภายใน",
+  material:"High-Density PU Foam",location:"ระหว่างผนังนอก–ใน",func:"Thermal Insulation",spec:"50 mm",
+  note:"การฉีดแบบไร้รอยต่อช่วยลด Thermal Bridge และลดโอกาสความชื้นแทรก",
+  list:["High-Density Polyurethane Foam","Seamless Injected Formation","Thickness 50 mm"]
+ },
+ cooling:{
+  code:"HOTSPOT 8",title:"ระบบทำความเย็น Inverter",
+  desc:"ระบบทำความเย็นใช้ Inverter Compressor เพื่อควบคุมอุณหภูมิอย่างต่อเนื่องและลดการใช้พลังงาน",
+  material:"Inverter Compressor + R290",location:"Service Compartment",func:"ควบคุมอุณหภูมิ",spec:"2–8°C / 15–25°C",
+  note:"ใช้สารทำความเย็น R290 และทำงานร่วมกับ Sensor, Fan และ Controller",
+  list:["Inverter Compressor","R290 Refrigerant","Electronic Temperature Controller"]
+ },
+ power:{
+  code:"HOTSPOT 9",title:"ระบบไฟฟ้าและบอร์ดควบคุม",
+  desc:"ภายในมี Power Distribution และ Control Board สำหรับรับคำสั่งจาก Processor แล้วจ่ายไฟไปยังกลอนประตู เซ็นเซอร์ และอุปกรณ์ย่อยแต่ละชุด",
+  material:"Power Supply + Control Board",location:"Service Compartment",func:"จ่ายไฟและควบคุม I/O",spec:"Multi-Channel Door Control",
+  note:"แยกวงจรโหลดที่สำคัญและมีระบบสำรองไฟสำหรับการรับยาเมื่อไฟฟ้าหลักขัดข้อง",
+  list:["Industrial Power Supply","Multi-Channel Door Controller","Fuse / Protection","I/O Feedback Interface"]
+ },
+ rfid:{
+  code:"HOTSPOT 10",title:"RFID Reader",
+  desc:"เครื่องอ่านบัตรแบบไร้สายสำหรับยืนยันตัวตนเจ้าหน้าที่หรือผู้ใช้งานตามสิทธิ์ที่กำหนด",
+  material:"RFID / Smart Card Reader",location:"ข้าง QR Scanner",func:"Identity Verification",spec:"Staff / ID / Smart Card",
+  note:"สามารถใช้ร่วมกับระบบสิทธิ์ของโรงพยาบาลและบันทึก Audit Log",
+  list:["Contactless RFID Reader","เชื่อมกับ User Permission / Audit System"]
+ },
+ interior:{
+  code:"HOTSPOT 11",title:"ผนังภายในและถาดยา SUS304",
+  desc:"พื้นผิวสัมผัสด้านในใช้ Stainless Steel SUS304 เพื่อความทนทานต่อสนิมและสะดวกต่อการทำความสะอาด",
+  material:"Stainless Steel SUS304",location:"ผนังภายใน + ชั้นวาง",func:"พื้นผิวจัดเก็บยา",spec:"Medical-Grade Interior",
+  note:"ถาดวางยาเป็น Perforated Sheet เพื่อให้ลมผ่านได้ทั่วถึง",
+  list:["SUS304 Interior Panel","SUS304 Perforated Tray","พื้นผิวทำความสะอาดง่าย"]
+ },
+ airflow:{
+  code:"HOTSPOT 12",title:"ระบบหมุนเวียนอากาศ",
+  desc:"Brushless DC Fan ช่วยหมุนเวียนอากาศเย็นและลดความแตกต่างของอุณหภูมิและความชื้นระหว่างชั้น",
+  material:"Brushless DC Fan",location:"ช่องทางลมภายใน",func:"Air Circulation",spec:"Continuous Circulation",
+  note:"ทำงานร่วมกับถาดเจาะรูและช่องทางลม เพื่อกระจายอากาศผ่านช่องเก็บยา",
+  list:["Brushless DC Fan","Internal Air Duct","Perforated Stainless Tray"]
+ },
+ fan:{
+  code:"HOTSPOT 13",title:"พัดลมและชุดระบายความร้อนด้านหลัง",
+  desc:"ชุดพัดลมและช่องระบายอากาศช่วยคายความร้อนจาก Condenser และอุปกรณ์ไฟฟ้าด้านหลังตู้",
+  material:"Cooling / Condenser Fan",location:"ด้านหลัง",func:"Heat Rejection",spec:"Rear Ventilation",
+  note:"ควรเว้นระยะด้านหลังเพียงพอสำหรับการระบายความร้อนและงานบำรุงรักษา",
+  list:["Condenser Fan","Rear Ventilation Grill","Service Access"]
+ },
+ sensor:{
+  code:"HOTSPOT 14",title:"Temperature & Humidity Sensor",
+  desc:"ระบบใช้เซ็นเซอร์อุณหภูมิความแม่นยำสูงและเซ็นเซอร์ความชื้นเพื่อส่งค่ากลับไปยัง Controller และ Dashboard",
+  material:"PT100 + Humidity Sensor",location:"ภายในโซนอากาศ",func:"Monitoring & Feedback",spec:"35–60% RH",
+  note:"ข้อมูลถูกนำไปควบคุม Compressor / Fan / Dehumidifier และใช้เป็นประวัติการเก็บรักษา",
+  list:["PT100 Temperature Sensor","Relative Humidity Sensor","Data Logging / Alarm"]
+ },
+ pc:{
+  code:"HOTSPOT 15",title:"Industrial Mini PC",
+  desc:"หน่วยประมวลผลหลักของตู้ ทำหน้าที่เชื่อม User Interface, Locker Controller, Sensor และระบบภายนอก",
+  material:"Industrial Mini PC",location:"ตู้ Service ด้านหลัง",func:"Main Processing Unit",spec:"Wi-Fi / LAN / 4G",
+  note:"ออกแบบให้เชื่อมต่อระบบโรงพยาบาล HIS / Database และ Cloud Operations Portal",
+  list:["Industrial Mini PC","Wi-Fi Module","Ethernet LAN","4G Cellular Module"]
+ },
+ battery:{
+  code:"HOTSPOT 16",title:"ระบบสำรองไฟ Lithium-ion",
+  desc:"แบตเตอรี่สำรองจ่ายไฟให้ระบบควบคุม หน้าจอ และกลอนประตู เพื่อให้ผู้ป่วยยังสามารถดำเนินการรับยาได้ในช่วงไฟดับระยะสั้น",
+  material:"Lithium-ion Backup Battery",location:"ฐาน / Service Compartment",func:"Emergency Backup Power",spec:"≈ 2–4 ชั่วโมง",
+  note:"เป้าหมายคือรักษาการทำงานของฟังก์ชันจำเป็นระหว่างรอเจ้าหน้าที่เข้าตรวจแก้ระบบไฟฟ้า",
+  list:["Lithium-ion Battery Pack","Battery Management System","Backup Power Controller"]
+ }
+};
+
+const viewer=document.getElementById("viewer"),scene=document.getElementById("scene"),label=document.getElementById("viewLabel");
+let ry=-18,rx=-7,startX=0,startY=0,startRy=0,startRx=0,drag=false,auto=true,raf,last=performance.now();
+
+function scaleForViewport(){
+  if(innerWidth<620)return .76;
+  if(innerWidth<980)return .88;
+  return 1;
+}
+function apply(noTransition=false){
+  const s=scaleForViewport();
+  scene.classList.toggle("no-transition",noTransition);
+  scene.style.transform=`translate(-50%,-50%) scale(${s}) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  let a=(((-ry)%360)+360)%360;
+  label.textContent=a<45||a>=315?"Front View":a<135?"Right View":a<225?"Back View":"Left View";
+}
+function snap(y){auto=false;document.getElementById("rotateBtn").classList.remove("active");ry=y;rx=-7;apply()}
+function resetView(){ry=-18;rx=-7;apply();auto=false;document.getElementById("rotateBtn").classList.remove("active")}
+function toggleAuto(){
+ auto=!auto;document.getElementById("rotateBtn").classList.toggle("active",auto);
+}
+function tick(t){
+ if(auto&&!drag){const dt=t-last;ry-=dt*.018;apply(true)}
+ last=t;raf=requestAnimationFrame(tick)
+}
+raf=requestAnimationFrame(tick);
+
+function start(e){
+ drag=true;auto=false;document.getElementById("rotateBtn").classList.remove("active");
+ viewer.classList.add("dragging");scene.classList.add("no-transition");
+ const p=e.touches?e.touches[0]:e;startX=p.clientX;startY=p.clientY;startRy=ry;startRx=rx;
+}
+function move(e){
+ if(!drag)return;
+ const p=e.touches?e.touches[0]:e;
+ ry=startRy+(p.clientX-startX)*.55;
+ rx=Math.max(-28,Math.min(18,startRx-(p.clientY-startY)*.16));
+ apply(true);
+ if(e.cancelable)e.preventDefault();
+}
+function end(){drag=false;viewer.classList.remove("dragging");scene.classList.remove("no-transition")}
+viewer.addEventListener("mousedown",start);window.addEventListener("mousemove",move);window.addEventListener("mouseup",end);
+viewer.addEventListener("touchstart",start,{passive:false});viewer.addEventListener("touchmove",move,{passive:false});window.addEventListener("touchend",end);
+
+function showPart(key){
+ const p=parts[key];if(!p)return;
+ document.getElementById("partCode").textContent=p.code;
+ document.getElementById("partTitle").textContent=p.title;
+ document.getElementById("partDesc").textContent=p.desc;
+ document.getElementById("partMaterial").textContent=p.material;
+ document.getElementById("partLocation").textContent=p.location;
+ document.getElementById("partFunction").textContent=p.func;
+ document.getElementById("partSpec").textContent=p.spec;
+ document.getElementById("partNote").textContent=p.note;
+ document.getElementById("partList").innerHTML=p.list.map(x=>`<li>${x}</li>`).join("");
+ if(innerWidth<980)document.querySelector(".info-card").scrollIntoView({behavior:"smooth",block:"start"});
+}
+document.querySelectorAll(".hotspot").forEach(b=>{
+ b.addEventListener("pointerdown",e=>e.stopPropagation());
+ b.addEventListener("click",e=>{e.stopPropagation();showPart(b.dataset.part)});
+});
+
+function toggleXray(btn){
+ document.body.classList.toggle("xray");
+ btn.classList.toggle("active",document.body.classList.contains("xray"));
+}
+function setMode(mode,btn){
+ document.querySelectorAll(".modebar button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
+ document.body.classList.toggle("xray",mode==="xray");
+}
+showPart("led");
+apply();
+window.addEventListener("resize",()=>apply(true));
+</script>
+</body>
+</html>
