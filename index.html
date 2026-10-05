@@ -116,7 +116,7 @@ main{max-width:1280px;margin:auto;padding:22px}
 .front .hs-led{right:5px;top:6px}.front .hs-screen{right:63px;top:92px}.front .hs-scan{right:70px;top:178px}.front .hs-door{right:9px;top:307px}.front .hs-base{right:10px;bottom:20px}
 .right .hs-body{right:18px;top:55px}.right .hs-insulation{right:18px;top:135px}.right .hs-cooling{right:19px;top:222px}.right .hs-power{right:18px;bottom:83px}
 .left .hs-rfid{left:15px;top:178px}.left .hs-inner{left:15px;top:305px}.left .hs-air{left:15px;top:412px}
-.back .hs-fan{right:28px;top:120px}.back .hs-sensor{right:26px;top:265px}.back .hs-pc{right:25px;bottom:135px}.back .hs-battery{left:27px;bottom:95px}
+.back .hs-fan{right:28px;top:120px}.back .hs-sensor{right:26px;top:265px}.back .hs-pc{right:25px;bottom:135px}.back .hs-battery{left:27px;bottom:95px}.back .hs-desiccant{left:26px;top:285px}
 
 .viewer-bottom{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:11px}
 .angle-buttons{display:flex;gap:7px;flex-wrap:wrap}
@@ -191,6 +191,7 @@ body.xray .internal-overlay{display:block}
     <span>15.6" Touchscreen</span>
     <span>2–8°C / 15–25°C</span>
     <span>35–60% RH</span>
+    <span>Pharma-grade Silica Gel</span>
   </div>
 </section>
 
@@ -273,6 +274,7 @@ body.xray .internal-overlay{display:block}
             <button class="hotspot hs-sensor" data-part="sensor">14</button>
             <button class="hotspot hs-pc" data-part="pc">15</button>
             <button class="hotspot hs-battery" data-part="battery">16</button>
+            <button class="hotspot hs-desiccant" data-part="desiccant">17</button>
           </div>
 
           <div class="face top"></div>
@@ -340,7 +342,7 @@ body.xray .internal-overlay{display:block}
     <div class="sys"><div class="icon">06</div><h3>Perforated Tray</h3><p>ถาด Stainless 304 แบบเจาะรู ช่วยให้อากาศและลมเย็นหมุนเวียนผ่านทุกช่อง</p></div>
     <div class="sys"><div class="icon">07</div><h3>Electric Lock + Feedback</h3><p>Solenoid Lock / Electromagnetic Latch พร้อม Feedback Signal และ Magnetic Door Switch ตรวจสถานะล็อกและปิดบาน</p></div>
     <div class="sys"><div class="icon">08</div><h3>Cooling System</h3><p>Inverter Compressor ใช้สารทำความเย็น R290 ออกแบบรองรับโซน 2–8°C และ 15–25°C</p></div>
-    <div class="sys"><div class="icon">09</div><h3>Humidity Control</h3><p>Dehumidifier รักษาความชื้นสัมพัทธ์ประมาณ 35–60% RH เพื่อลดความเสี่ยงต่อยาและบรรจุภัณฑ์</p></div>
+    <div class="sys"><div class="icon">09</div><h3>Humidity Control</h3><p>Dehumidifier รักษาความชื้นสัมพัทธ์ประมาณ 35–60% RH ร่วมกับตลับ Pharma-grade Silica Gel แบบไม่ใช้ Cobalt Chloride เพื่อช่วยลดความชื้นส่วนเกินและปกป้องยาและบรรจุภัณฑ์</p></div>
     <div class="sys"><div class="icon">10</div><h3>Air Circulation</h3><p>Brushless DC Fan หมุนเวียนอากาศเพื่อให้อุณหภูมิและความชื้นสม่ำเสมอ</p></div>
     <div class="sys"><div class="icon">11</div><h3>Temperature & Humidity Sensor</h3><p>PT100 สำหรับวัดอุณหภูมิความแม่นยำสูง ร่วมกับ Humidity Sensor ส่งข้อมูลเข้าระบบควบคุม</p></div>
     <div class="sys"><div class="icon">12</div><h3>Industrial Mini PC</h3><p>ประมวลผลหลัก พร้อม Wi-Fi / LAN / 4G สำหรับเชื่อม HIS / Database และ Cloud Dashboard</p></div>
@@ -348,6 +350,7 @@ body.xray .internal-overlay{display:block}
     <div class="sys"><div class="icon">14</div><h3>QR / Barcode Scanner</h3><p>Embedded CMOS Imager Scanner อ่าน QR และ Barcode จากหน้าจอมือถือหรือกระดาษ</p></div>
     <div class="sys"><div class="icon">15</div><h3>RFID Reader</h3><p>รองรับบัตรเจ้าหน้าที่ บัตรประชาชน หรือ Smart Card สำหรับการยืนยันตัวตนตามสิทธิ์</p></div>
     <div class="sys"><div class="icon">16</div><h3>Backup Power</h3><p>Lithium-ion Battery สำรองให้ระบบควบคุม หน้าจอ และกลอนประตูทำงานต่อประมาณ 2–4 ชั่วโมง</p></div>
+    <div class="sys"><div class="icon">17</div><h3>Moisture Protection Cartridge</h3><p>ตลับดูดความชื้น Pharma-grade Silica Gel แบบไม่ใช้ Cobalt Chloride ติดตั้งในช่องอากาศภายในโดยไม่สัมผัสยาโดยตรง ใช้เสริม Dehumidifier เพื่อช่วยลดความชื้นส่วนเกินและปกป้องบรรจุภัณฑ์ยา</p></div>
   </div>
 </section>
 
@@ -467,6 +470,13 @@ const parts={
   material:"Lithium-ion Backup Battery",location:"ฐาน / Service Compartment",func:"Emergency Backup Power",spec:"≈ 2–4 ชั่วโมง",
   note:"เป้าหมายคือรักษาการทำงานของฟังก์ชันจำเป็นระหว่างรอเจ้าหน้าที่เข้าตรวจแก้ระบบไฟฟ้า",
   list:["Lithium-ion Battery Pack","Battery Management System","Backup Power Controller"]
+ },
+ desiccant:{
+  code:"HOTSPOT 17",title:"ตลับดูดความชื้นสำหรับตู้ยา",
+  desc:"ตลับดูดความชื้นติดตั้งภายในช่องทางอากาศของตู้เพื่อช่วยดูดซับความชื้นส่วนเกินและลดการเกิดความชื้นสะสม โดยออกแบบให้ไม่สัมผัสยาและบรรจุภัณฑ์โดยตรง",
+  material:"Pharma-grade Silica Gel • Cobalt-Chloride-Free",location:"ช่องอากาศภายใน / Service Compartment",func:"เสริมการควบคุมความชื้น",spec:"Replaceable Sealed Cartridge",
+  note:"เลือกใช้ Silica Gel เกรดสำหรับงานยา/อาหาร แบบไม่ใช้สารบ่งชี้ Cobalt Chloride และบรรจุในตลับปิดที่มีแผ่นระบายไอแบบไม่ปล่อยฝุ่น ใช้เป็นระบบเสริม ไม่ใช้แทน Dehumidifier และ Humidity Sensor หลัก",
+  list:["Pharma-grade Silica Gel","Cobalt-Chloride-Free / Non-indicating","Dust-contained Breathable Cartridge","ไม่สัมผัสยาโดยตรง","กำหนดรอบตรวจและเปลี่ยนตลับตามค่า RH และสภาพการใช้งาน"]
  }
 };
 
