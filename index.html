@@ -305,9 +305,10 @@ body.xray .internal-overlay{display:block}
     <div class="part-title" id="partTitle">แถบไฟสถานะ LED</div>
     <p class="part-desc" id="partDesc">แถบ LED บริเวณขอบบนของตู้ ใช้แสดงสถานะการทำงานเพื่อให้ผู้ใช้งานและเจ้าหน้าที่มองเห็นได้ทันที</p>
     <div class="detail-grid">
-      <div class="detail-box"><small>วัสดุ / อุปกรณ์</small><b id="partMaterial">LED Status Strip</b></div>
+      <div class="detail-box"><small>วัสดุ / อุปกรณ์ที่ใช้</small><b id="partMaterial">LED Status Strip</b></div>
       <div class="detail-box"><small>ตำแหน่ง</small><b id="partLocation">ขอบบนด้านหน้า</b></div>
       <div class="detail-box"><small>หน้าที่หลัก</small><b id="partFunction">แสดงสถานะระบบ</b></div>
+      <div class="detail-box"><small>คุณสมบัติเด่น</small><b id="partProperty">มองเห็นสถานะได้รวดเร็ว</b></div>
       <div class="detail-box"><small>Specification</small><b id="partSpec">เขียว / ฟ้า / แดง</b></div>
     </div>
     <div class="note" id="partNote">สีเขียว = พร้อมใช้งาน • สีฟ้า = กำลังทำความเย็น • สีแดง = ระบบขัดข้องหรือมี Alert</div>
@@ -479,6 +480,29 @@ const parts={
  }
 };
 
+const partProperties={
+ led:"แสดงสถานะด้วยสี มองเห็นได้จากระยะไกล และแจ้ง Ready / Cooling / Alert ได้ทันที",
+ screen:"กระจกนิรภัย 2 mm ช่วยป้องกันรอยขีดข่วนและละอองน้ำ พร้อมรองรับการสัมผัส",
+ scanner:"อ่าน QR และ Barcode ได้จากทั้งหน้าจอมือถือและกระดาษ ช่วยลดความผิดพลาดในการยืนยัน Order",
+ door:"โครงสร้างแข็งแรง ล็อกด้วยไฟฟ้า และตรวจได้ทั้งสถานะล็อกกับสถานะปิดประตูแบบ Real-time",
+ base:"รับน้ำหนักสูง ปรับระดับตู้ได้ ล้อสามารถล็อกเพื่อป้องกันการเคลื่อนตัวระหว่างใช้งาน",
+ body:"แข็งแรง ทนสนิมและสารทำความสะอาดจาก Powder Coating พร้อมช่วยปกป้องโครงสร้างภายใน",
+ insulation:"เป็นฉนวนความร้อน ช่วยลดการถ่ายเทความร้อนและรักษาอุณหภูมิภายในตู้ให้คงที่",
+ cooling:"ทำความเย็นและควบคุมอุณหภูมิ รองรับโซน 2–8°C และ 15–25°C พร้อมปรับกำลังแบบ Inverter",
+ power:"กระจายและควบคุมไฟไปยังกลอน เซ็นเซอร์ และอุปกรณ์ต่าง ๆ พร้อมวงจรป้องกัน",
+ rfid:"ยืนยันตัวตนแบบไร้สัมผัส เชื่อมสิทธิ์ผู้ใช้และบันทึก Audit Log ได้",
+ interior:"SUS304 ทนสนิม ทนความชื้น ทำความสะอาดง่าย และถาดเจาะรูช่วยให้อากาศไหลผ่าน",
+ airflow:"กระจายลมเย็นและความชื้นให้สม่ำเสมอ ลดจุดร้อนหรือจุดอับภายในช่องเก็บยา",
+ fan:"ช่วยระบายความร้อนจาก Condenser และชุดไฟฟ้า ลดความร้อนสะสมบริเวณ Service Compartment",
+ sensor:"ตรวจวัดอุณหภูมิและความชื้นแบบต่อเนื่อง ใช้ควบคุมระบบและส่ง Alarm เมื่อค่าออกนอกช่วง",
+ pc:"ประมวลผลและเชื่อมต่อระบบตู้กับ HIS / Database / Cloud ผ่าน Wi-Fi, LAN หรือ 4G",
+ battery:"สำรองไฟให้หน้าจอ ระบบควบคุม และกลอนประตูทำงานต่อได้ประมาณ 2–4 ชั่วโมงเมื่อไฟดับ",
+ desiccant:"ดูดซับความชื้นส่วนเกิน ช่วยป้องกันความชื้นสะสมและบรรจุภัณฑ์ยา โดยไม่สัมผัสยาโดยตรง"
+};
+for(const [key,property] of Object.entries(partProperties)){
+  if(parts[key]) parts[key].property=property;
+}
+
 const viewer=document.getElementById("viewer"),scene=document.getElementById("scene"),label=document.getElementById("viewLabel");
 let ry=-18,rx=-7,startX=0,startY=0,startRy=0,startRx=0,drag=false,auto=true,raf,last=performance.now();
 
@@ -530,6 +554,7 @@ function showPart(key){
  document.getElementById("partMaterial").textContent=p.material;
  document.getElementById("partLocation").textContent=p.location;
  document.getElementById("partFunction").textContent=p.func;
+ document.getElementById("partProperty").textContent=p.property||"-";
  document.getElementById("partSpec").textContent=p.spec;
  document.getElementById("partNote").textContent=p.note;
  document.getElementById("partList").innerHTML=p.list.map(x=>`<li>${x}</li>`).join("");
